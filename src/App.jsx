@@ -51,6 +51,7 @@ export default function App() {
   }
 
   const name = trackName(mood);
+  const bpm = Math.round(118 + 6 * mood.energy); // same formula as the engine, but always in step with the sliders
 
   return (
     <div className={`app ${dropping ? 'is-dropping' : ''}`}>
@@ -83,7 +84,7 @@ export default function App() {
                 : <svg viewBox="0 0 24 24"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l11-6.5a1 1 0 0 0 0-1.72l-11-6.5A1 1 0 0 0 8 5.5z" /></svg>}
             </button>
             <div className="np">
-              <small><span className="beats" aria-hidden="true">{[0, 1, 2, 3].map((i) => <i key={i} className={playing && beat === i ? 'on' : ''} />)}</span>{engine.bpm} BPM</small>
+              <small><span className="beats" aria-hidden="true">{[0, 1, 2, 3].map((i) => <i key={i} className={playing && beat === i ? 'on' : ''} />)}</span>{bpm} BPM</small>
               <strong>{name}</strong>
             </div>
             <button className="share" onClick={share} aria-label="Share this vibe">
@@ -93,7 +94,7 @@ export default function App() {
           </section>
 
           <div className="rig">
-            <Turntable bpm={engine.bpm} playing={playing} held={dropping} name={name} night={mood.night} onHold={dropOn} onRelease={dropOff} />
+            <Turntable bpm={bpm} playing={playing} held={dropping} name={name} night={mood.night} onHold={dropOn} onRelease={dropOff} />
 
             <section className="mixer" aria-label="Mixer">
               <div className="cues" role="group" aria-label="Moods">
