@@ -70,7 +70,7 @@ export default function App() {
           <p className="kicker">a tiny deep house machine</p>
           <h1>Set the mood.<br />The music follows.</h1>
           <p className="sub">Every kick, clap and chord is made live in your browser. No tracks, no repeats, just vibes.</p>
-          <button className="go" onClick={start}><span className="go-dot" />Tap to start the night</button>
+          <button className="go" onClick={start}><span className="go-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l11-6.5a1 1 0 0 0 0-1.72l-11-6.5A1 1 0 0 0 8 5.5z" /></svg></span>Start the night</button>
           <p className="hint">Turn your sound on</p>
         </div>
       )}
