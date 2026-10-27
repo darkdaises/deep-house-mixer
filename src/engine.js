@@ -38,8 +38,13 @@ export class Engine {
   get bpm() { return Math.round(lerp(118, 124, this.mood.energy)); }
 
   async start() {
+    // iPhone: web audio follows the silent switch unless the page says it's playing music,
+    // so (1) tell Safari this is media playback and (2) on older iOS, start a silent <audio> loop
+    // in the same tap, which switches the page into "music" mode.
+    try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch (e) {}
+    this.unlockIOS();
     if (!this.ctx) this.build();
-    if (this.ctx.state !== 'running') await this.ctx.resume();
+    if (this.ctx.state !== 'running') { try { await this.ctx.resume(); } catch (e) {} }
     if (this.playing) return;
     this.playing = true;
     this.step = 0; this.bar = 0;
@@ -47,6 +52,21 @@ export class Engine {
     this.master.gain.cancelScheduledValues(this.ctx.currentTime);
     this.master.gain.setTargetAtTime(0.72, this.ctx.currentTime, 0.4);
     this.timer = setInterval(() => this.schedule(), 25);
+  }
+
+  unlockIOS() {
+    if (this.silent) { this.silent.play().catch(() => {}); return; }
+    // one second of silence as a tiny WAV
+    const rate = 8000, n = rate, buf = new ArrayBuffer(44 + n), v = new DataView(buf);
+    const w = (o, str) => [...str].forEach((c, i) => v.setUint8(o + i, c.charCodeAt(0)));
+    w(0, 'RIFF'); v.setUint32(4, 36 + n, true); w(8, 'WAVE'); w(12, 'fmt '); v.setUint32(16, 16, true);
+    v.setUint16(20, 1, true); v.setUint16(22, 1, true); v.setUint32(24, rate, true); v.setUint32(28, rate, true);
+    v.setUint16(32, 1, true); v.setUint16(34, 8, true); w(36, 'data'); v.setUint32(40, n, true);
+    for (let i = 0; i < n; i++) v.setUint8(44 + i, 128);
+    const a = new Audio(URL.createObjectURL(new Blob([buf], { type: 'audio/wav' })));
+    a.loop = true; a.setAttribute('playsinline', ''); a.volume = 0.01;
+    a.play().catch(() => {});
+    this.silent = a;
   }
 
   stop() {
@@ -155,6 +175,9 @@ export class Engine {
     for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
 
     this.setMood({});
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden && this.playing && this.ctx.state !== 'running') this.ctx.resume().catch(() => {});
+    });
   }
 
   impulse(seconds, decay) {
