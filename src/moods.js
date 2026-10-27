@@ -3,11 +3,11 @@ export const PRESETS = [
   { id: 'rooftop', label: 'Rooftop in Cairo', mood: { night: 0.12, energy: 0.45, warmth: 0.8, groove: 0.45 } },
   { id: 'sunday', label: 'Sunday reset', mood: { night: 0.25, energy: 0.15, warmth: 0.55, groove: 0.3 } },
   { id: 'walk', label: 'Walking home glow', mood: { night: 0.55, energy: 0.35, warmth: 0.45, groove: 0.6 } },
-  { id: 'warehouse', label: 'Brooklyn warehouse, 3am', mood: { night: 0.95, energy: 0.9, warmth: 0.85, groove: 0.2 } }
+  { id: 'warehouse', label: 'Warehouse, 3am', mood: { night: 0.95, energy: 0.9, warmth: 0.85, groove: 0.2 } }
 ];
 
 export const SLIDERS = [
-  { key: 'night', label: 'Time of night', low: 'Sunset', high: '3am' },
+  { key: 'night', label: 'Night', low: 'Sunset', high: '3am' },
   { key: 'energy', label: 'Energy', low: 'Chill', high: 'Dancing' },
   { key: 'warmth', label: 'Warmth', low: 'Next room', high: 'Front row' },
   { key: 'groove', label: 'Groove', low: 'Straight', high: 'Bouncy' }

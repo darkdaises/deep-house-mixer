@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Engine } from './engine.js';
 import Visualizer from './Visualizer.jsx';
+import Turntable from './Turntable.jsx';
+import Fader from './Fader.jsx';
 import { PRESETS, SLIDERS, trackName, moodFromUrl, moodToUrl } from './moods.js';
 
 const DEFAULT = PRESETS[0].mood;
@@ -76,43 +78,39 @@ export default function App() {
       {started && (
         <main className="deck">
           <section className="now" aria-live="polite">
-            <div className="beats" aria-hidden="true">{[0, 1, 2, 3].map((i) => <i key={i} className={playing && beat === i ? 'on' : ''} />)}</div>
+            <button className="play" onClick={toggle} aria-label={playing ? 'Pause' : 'Play'}>
+              {playing ? <svg viewBox="0 0 24 24"><rect x="6" y="5" width="4" height="14" rx="1" /><rect x="14" y="5" width="4" height="14" rx="1" /></svg>
+                : <svg viewBox="0 0 24 24"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l11-6.5a1 1 0 0 0 0-1.72l-11-6.5A1 1 0 0 0 8 5.5z" /></svg>}
+            </button>
             <div className="np">
-              <small>Now playing · {engine.bpm} BPM</small>
+              <small><span className="beats" aria-hidden="true">{[0, 1, 2, 3].map((i) => <i key={i} className={playing && beat === i ? 'on' : ''} />)}</span>{engine.bpm} BPM</small>
               <strong>{name}</strong>
             </div>
-            <button className="play" onClick={toggle} aria-label={playing ? 'Pause' : 'Play'}>{playing ? '❚❚' : '▶'}</button>
-          </section>
-
-          <section className="presets" aria-label="Moods">
-            {PRESETS.map((p) => (
-              <button key={p.id} className={preset?.id === p.id ? 'on' : ''} onClick={() => setMood({ ...p.mood })}>
-                {p.label}
-              </button>
-            ))}
-          </section>
-
-          <section className="sliders">
-            {SLIDERS.map((s) => (
-              <label key={s.key} className="slider" style={{ '--v': mood[s.key] }}>
-                <span className="s-label">{s.label}</span>
-                <input type="range" min="0" max="1" step="0.01" value={mood[s.key]}
-                  onChange={(e) => setMood((m) => ({ ...m, [s.key]: parseFloat(e.target.value) }))} />
-                <span className="ends"><span>{s.low}</span><span>{s.high}</span></span>
-              </label>
-            ))}
-          </section>
-
-          <section className="actions">
-            <button className={`drop ${dropping ? 'held' : ''}`} disabled={!playing}
-              onPointerDown={(e) => { e.currentTarget.setPointerCapture(e.pointerId); dropOn(); }}
-              onPointerUp={dropOff} onPointerCancel={dropOff} onLostPointerCapture={dropOff}
-              onContextMenu={(e) => e.preventDefault()}>
-              {dropping ? 'Building… let go to drop' : 'Hold to build, release to drop'}
-              <small>or hold space</small>
+            <button className="share" onClick={share} aria-label="Share this vibe">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M7.5 7.5 12 3l4.5 4.5" /><path d="M8 10H6.5A1.5 1.5 0 0 0 5 11.5v8A1.5 1.5 0 0 0 6.5 21h11a1.5 1.5 0 0 0 1.5-1.5v-8A1.5 1.5 0 0 0 17.5 10H16" /></svg>
+              <span>{copied ? 'Copied' : 'Share'}</span>
             </button>
-            <button className="share" onClick={share}>{copied ? 'Link copied ✓' : 'Share this vibe'}</button>
           </section>
+
+          <div className="rig">
+            <Turntable bpm={engine.bpm} playing={playing} held={dropping} name={name} night={mood.night} onHold={dropOn} onRelease={dropOff} />
+
+            <section className="mixer" aria-label="Mixer">
+              <div className="cues" role="group" aria-label="Moods">
+                {PRESETS.map((p) => (
+                  <button key={p.id} className={preset?.id === p.id ? 'on' : ''} onClick={() => setMood({ ...p.mood })}>
+                    <i aria-hidden="true" />{p.label}
+                  </button>
+                ))}
+              </div>
+              <div className="faders">
+                {SLIDERS.map((sl) => (
+                  <Fader key={sl.key} label={sl.label} low={sl.low} high={sl.high} value={mood[sl.key]}
+                    onChange={(v) => setMood((m) => ({ ...m, [sl.key]: v }))} />
+                ))}
+              </div>
+            </section>
+          </div>
         </main>
       )}
     </div>
