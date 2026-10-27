@@ -69,7 +69,7 @@ export default function App() {
           <h1>Set the mood.<br />The music follows.</h1>
           <p className="sub">Every kick, clap and chord is made live in your browser. No tracks, no repeats, just vibes.</p>
           <button className="go" onClick={start}><span className="go-dot" />Tap to start the night</button>
-          <p className="hint">Sound on 🔊</p>
+          <p className="hint">Turn your sound on</p>
         </div>
       )}
 
@@ -87,7 +87,7 @@ export default function App() {
           <section className="presets" aria-label="Moods">
             {PRESETS.map((p) => (
               <button key={p.id} className={preset?.id === p.id ? 'on' : ''} onClick={() => setMood({ ...p.mood })}>
-                <span aria-hidden="true">{p.emoji}</span>{p.label}
+                {p.label}
               </button>
             ))}
           </section>
@@ -108,7 +108,7 @@ export default function App() {
               onPointerDown={(e) => { e.currentTarget.setPointerCapture(e.pointerId); dropOn(); }}
               onPointerUp={dropOff} onPointerCancel={dropOff} onLostPointerCapture={dropOff}
               onContextMenu={(e) => e.preventDefault()}>
-              {dropping ? 'Let go…' : 'Hold to DROP'}
+              {dropping ? 'Building… let go to drop' : 'Hold to build, release to drop'}
               <small>or hold space</small>
             </button>
             <button className="share" onClick={share}>{copied ? 'Link copied ✓' : 'Share this vibe'}</button>

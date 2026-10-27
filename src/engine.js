@@ -61,28 +61,58 @@ export class Engine {
     if (!this.ctx) return;
     const t = this.ctx.currentTime;
     // Warmth: a master low-pass from "next room" to "front row"
-    if (!this.dropping) this.tone.frequency.setTargetAtTime(this.warmthCutoff(), t, 0.08);
+    this.tone.frequency.setTargetAtTime(this.warmthCutoff(), t, 0.08);
     this.reverbSend.gain.setTargetAtTime(lerp(0.55, 0.32, this.mood.energy), t, 0.2);
   }
 
   warmthCutoff() { return lerp(700, 16000, Math.pow(this.mood.warmth, 1.6)); }
 
-  // Hold to filter everything down; let go and it slams back in.
+  // DJ-style drop. Hold: the bass and kick get cut, a resonant high-pass filter sweeps up like a DJ turning the
+  // filter knob, a noise riser swells and a clap roll builds. Let go: it waits for the next beat and slams back in.
   drop(on) {
     if (!this.ctx) return;
-    const t = this.ctx.currentTime;
-    this.dropping = on;
-    this.tone.frequency.cancelScheduledValues(t);
-    this.tone.frequency.setValueAtTime(this.tone.frequency.value, t);
+    const ctx = this.ctx, t = ctx.currentTime;
     if (on) {
-      this.tone.frequency.exponentialRampToValueAtTime(260, t + 1.2);
-      this.tone.Q.setTargetAtTime(6, t, 0.3);
-      this.kickBus.gain.setTargetAtTime(0.25, t, 0.25);
-    } else {
-      this.tone.frequency.exponentialRampToValueAtTime(this.warmthCutoff(), t + 0.05);
-      this.tone.Q.setTargetAtTime(0.7, t, 0.05);
-      this.kickBus.gain.setTargetAtTime(1, t, 0.02);
+      if (this.dropping) return;
+      this.dropping = true; this.dropStart = t;
+      const hp = this.hp.frequency;
+      hp.cancelScheduledValues(t); hp.setValueAtTime(30, t); hp.exponentialRampToValueAtTime(1200, t + 4);
+      this.hp.Q.cancelScheduledValues(t); this.hp.Q.setTargetAtTime(5, t, 0.6);
+      this.kickBus.gain.cancelScheduledValues(t); this.kickBus.gain.setTargetAtTime(0, t, 0.04);
+      // riser: filtered noise climbing up
+      const src = ctx.createBufferSource(), bp = ctx.createBiquadFilter(), g = ctx.createGain();
+      src.buffer = this.noise; src.loop = true;
+      bp.type = 'bandpass'; bp.Q.value = 2.5; bp.frequency.setValueAtTime(500, t); bp.frequency.exponentialRampToValueAtTime(9000, t + 4.5);
+      g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.2, t + 4.5);
+      src.connect(bp); bp.connect(g); g.connect(this.tone); g.connect(this.reverbSend);
+      src.start(t); this.riser = { src, g };
+      return;
     }
+    if (!this.dropping) return;
+    // land on the next beat
+    const beat = 60 / this.bpm;
+    let land = (this.kickTimes.filter((k) => k <= t).pop() ?? t) + beat;
+    while (land < t + 0.03) land += beat;
+    this.dropping = false;
+    const hp = this.hp.frequency;
+    hp.cancelScheduledValues(t); hp.setValueAtTime(hp.value, t); hp.setValueAtTime(20, land);
+    this.hp.Q.cancelScheduledValues(t); this.hp.Q.setValueAtTime(this.hp.Q.value, t); this.hp.Q.setValueAtTime(0.7, land);
+    this.kickBus.gain.cancelScheduledValues(t); this.kickBus.gain.setValueAtTime(0, t); this.kickBus.gain.setValueAtTime(1, land);
+    if (this.riser) {
+      const { src, g } = this.riser; g.gain.cancelScheduledValues(t); g.gain.setValueAtTime(g.gain.value, t);
+      g.gain.exponentialRampToValueAtTime(0.0001, land); src.stop(land + 0.05); this.riser = null;
+    }
+    // the kick on the landing beat may already have been skipped by the sequencer, so play it here
+    if (this.nextTime > land) { this.kick(land); this.kickTimes.push(land); }
+    this.impact(land);
+  }
+
+  impact(t) {
+    const ctx = this.ctx, o = ctx.createOscillator(), g = ctx.createGain();
+    o.type = 'sine'; o.frequency.setValueAtTime(90, t); o.frequency.exponentialRampToValueAtTime(32, t + 0.9);
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.8, t + 0.01); g.gain.exponentialRampToValueAtTime(0.001, t + 1.1);
+    o.connect(g); g.connect(this.bus); o.start(t); o.stop(t + 1.2);
+    this.noiseHit(t, 1.8, 0.26, 'highpass', 3500, this.bus, true);   // crash
   }
 
   onStep(fn) { this.listeners.add(fn); return () => this.listeners.delete(fn); }
@@ -99,7 +129,8 @@ export class Engine {
 
     // music bus -> tone filter -> compressor -> master -> out
     this.bus = ctx.createGain();
-    this.bus.connect(this.tone); this.tone.connect(comp); comp.connect(this.master);
+    this.hp = ctx.createBiquadFilter(); this.hp.type = 'highpass'; this.hp.frequency.value = 20; this.hp.Q.value = 0.7;
+    this.bus.connect(this.hp); this.hp.connect(this.tone); this.tone.connect(comp); comp.connect(this.master);
     this.master.connect(this.analyser); this.analyser.connect(ctx.destination);
 
     // kick has its own bus so the DROP can duck it
@@ -157,8 +188,14 @@ export class Engine {
     const { night, energy } = this.mood;
     const chord = PROGRESSION[this.bar];
 
-    if (s % 4 === 0) { this.kick(t); this.kickTimes.push(t); }
-    if ((s === 4 || s === 12) && energy > 0.12) this.clap(t, lerp(0.35, 0.6, energy));
+    if (this.dropping) {
+      // build-up: claps get faster the longer you hold (quarters, then eighths, then sixteenths)
+      const held = (t - this.dropStart) / 4, every = held < 0.35 ? 4 : held < 0.7 ? 2 : 1;
+      if (s % every === 0) this.clap(t, lerp(0.25, 0.55, Math.min(1, held)));
+    } else {
+      if (s % 4 === 0) { this.kick(t); this.kickTimes.push(t); }
+      if ((s === 4 || s === 12) && energy > 0.12) this.clap(t, lerp(0.35, 0.6, energy));
+    }
 
     // hats: the open off-beat hat is the heart of it; closed 16ths and a shaker come in with energy
     if (s % 4 === 2) this.hat(t, 0.16, lerp(0.16, 0.24, energy), 7000);

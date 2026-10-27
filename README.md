@@ -8,7 +8,7 @@ Every sound (kick, clap, hats, bass, chords) is synthesized live with the Web Au
 - **Energy**: 118 BPM and sparse → 124 BPM with full hats and percussion
 - **Warmth**: muffled "next room" → crisp "front row"
 - **Groove**: straight → swung
-- **Hold to DROP** (or hold space): filters everything down, slams back in when you let go
+- **Hold to build, release to drop** (or hold space): DJ-style. The kick and bass cut out, a resonant filter sweeps up, a riser swells and a clap roll speeds up. Let go and it lands on the next beat with an impact
 - **Share this vibe**: the link carries your slider settings
 
 ## Run it
