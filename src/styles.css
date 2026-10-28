@@ -121,7 +121,8 @@ button { font: inherit; color: inherit; cursor: pointer; -webkit-tap-highlight-c
   .play { width: 42px; height: 42px; }
   .share { height: 40px; padding: 0 12px; }
   /* the record floats in the middle and takes whatever height is left; the mixer sits at the bottom */
-  .app { min-height: 100dvh; }
+  .app { min-height: 100dvh; min-height: 100lvh; }
+  .deck { padding-bottom: calc(max(24px, env(safe-area-inset-bottom)) + max(0px, calc(100lvh - 100dvh))); }
   .deck { flex: 1; justify-content: flex-start; }
   .rig { flex: 1; display: flex; flex-direction: column; }
   .turntable { --pl: min(68vw, 34dvh, 290px); flex: 1; align-self: center; justify-content: center; width: calc(var(--pl) + 64px); padding: 0; background: none; border: 0; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; }
