@@ -23,7 +23,7 @@ export default function Visualizer({ engine, mood, dropping }) {
     const resize = () => {
       dpr = Math.min(window.devicePixelRatio || 1, 2);
       w = c.width = Math.floor(innerWidth * dpr * 0.5);   // half resolution: it's blurry on purpose, and cheap
-      h = c.height = Math.floor(innerHeight * dpr * 0.5);
+      h = c.height = Math.floor(Math.max(innerHeight, c.getBoundingClientRect().height) * dpr * 0.5);
     };
     resize(); addEventListener('resize', resize);
 
