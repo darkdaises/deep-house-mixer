@@ -115,41 +115,32 @@ button { font: inherit; color: inherit; cursor: pointer; -webkit-tap-highlight-c
   .rig { gap: 14px; }
   .mixer { padding: 16px; }
   .cues button { padding: 11px 10px; font-size: 12.5px; }
-  /* Phones: everything fits one screen. Smaller record, moods in one swipeable row, sideways faders. */
+  /* Phones: everything fits one screen. The record floats on its own, moods in one swipeable row, shorter faders. */
   .deck { gap: 12px; }
   .now { padding: 10px; border-radius: 18px; }
   .play { width: 42px; height: 42px; }
   .share { height: 40px; padding: 0 12px; }
-  .turntable { padding: 14px 14px 10px; border-radius: 22px; }
+  .turntable { padding: 4px 0 0; background: none; border: 0; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; }
   .platter { width: min(52vw, 220px); height: min(52vw, 220px); }
-  .arm { top: 14px; right: 18px; }
+  .arm { top: 4px; right: calc(50% - min(26vw, 110px) - 34px); }
   .arm::before { width: 26px; height: 26px; }
   .tt-hint { margin-top: 10px; font-size: 10.5px; }
   .mixer { gap: 10px; padding: 12px 14px 14px; border-radius: 22px; }
   .cues { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; margin: 0 -14px; padding: 0 14px; scroll-snap-type: x proximity; }
   .cues::-webkit-scrollbar { display: none; }
   .cues button { flex: none; padding: 10px 12px; font-size: 12.5px; white-space: nowrap; border-radius: 999px; scroll-snap-align: start; }
-  .faders { grid-template-columns: 1fr; gap: 2px; padding-top: 4px; }
-  .fader { display: grid; grid-template-columns: 62px 58px 1fr 58px; align-items: center; gap: 8px; padding-top: 0; }
-  .fader .f-end:nth-of-type(2) { text-align: right; }
-  .fader .f-end:first-child { text-align: left; }
-  .f-label { grid-column: 1; grid-row: 1; font-size: 11px; letter-spacing: .08em; text-align: left; }
-  .fader .f-end:first-child { grid-column: 4; grid-row: 1; }
-  .fader .f-end:nth-of-type(2) { grid-column: 2; grid-row: 1; }
+  .faders { gap: 4px; padding-top: 2px; }
+  .fader { gap: 6px; padding-top: 6px; }
+  .f-body { height: 132px; width: 46px; }
+  .f-cap { width: 40px; height: 22px; }
   .f-end { font-size: 10px; }
-  .f-body { grid-column: 3; grid-row: 1; width: auto; height: 44px; touch-action: pan-y; }
-  .f-ticks { inset: 0 10px; flex-direction: row; }
-  .f-ticks i { width: 1px; height: auto; margin: 14px 0; }
-  .f-ticks i:nth-child(5n+1) { margin: 10px 0; }
-  .f-slot { left: 10px; right: 10px; top: 50%; bottom: auto; width: auto; height: 6px; transform: translateY(-50%); }
-  .f-fill { top: 0; bottom: 0; left: 0; right: auto; height: auto; width: calc(var(--v) * 100%); background: linear-gradient(90deg, var(--hot), var(--cool)); }
-  .f-cap { left: calc(10px + var(--v) * (100% - 20px)); top: 50%; width: 22px; height: 36px; }
-  .f-cap b { width: 2px; height: 60%; }
+  .f-label { font-size: 11px; }
 }
 @media (max-width: 640px) and (max-height: 720px) {
-  .platter { width: min(44vw, 180px); height: min(44vw, 180px); }
-  .tt-hint { display: none; }
-  .f-body { height: 38px; }
+  .platter { width: min(44vw, 176px); height: min(44vw, 176px); }
+  .arm { right: calc(50% - min(22vw, 88px) - 34px); }
+  .tt-hint { margin-top: 6px; }
+  .f-body { height: 104px; }
   .share span { display: none; }
   .share { padding: 0 12px; }
   .brand { font-size: 14px; white-space: nowrap; }
