@@ -117,15 +117,23 @@ button { font: inherit; color: inherit; cursor: pointer; -webkit-tap-highlight-c
   .cues button { padding: 11px 10px; font-size: 12.5px; }
   /* Phones: everything fits one screen. The record floats on its own, moods in one swipeable row, shorter faders. */
   .deck { gap: 12px; }
-  .now { padding: 10px; border-radius: 18px; }
-  .play { width: 42px; height: 42px; }
-  .share { height: 40px; padding: 0 12px; }
+  .now { padding: 6px 6px 6px 8px; gap: 10px; border-radius: 16px; }
+  .play { width: 34px; height: 34px; }
+  .play svg { width: 15px; height: 15px; }
+  .np { gap: 1px; }
+  .np small { font-size: 10px; }
+  .np strong { font-size: 15px; }
+  .share { height: 34px; padding: 0 10px; border-radius: 11px; }
+  .share svg { width: 16px; height: 16px; }
+  /* one box: the record on top, the moods and faders under it */
+  .rig { gap: 0; padding: 14px 14px 16px; border-radius: 24px; background: linear-gradient(160deg, rgba(40, 30, 60, .55), rgba(10, 8, 20, .6)); border: 1px solid var(--edge); -webkit-backdrop-filter: blur(18px); backdrop-filter: blur(18px); }
+  .rig .mixer { background: none; border: 0; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; padding: 12px 0 0; border-radius: 0; }
   /* the record floats in the middle and takes whatever height is left; the mixer sits at the bottom */
   .app { min-height: 100dvh; min-height: 100lvh; }
   .deck { padding-bottom: calc(max(24px, env(safe-area-inset-bottom)) + max(0px, calc(100lvh - 100dvh))); }
   .deck { flex: 1; justify-content: flex-start; }
   .rig { flex: 1; display: flex; flex-direction: column; }
-  .turntable { --pl: min(68vw, 34dvh, 290px); flex: 1; align-self: center; justify-content: center; width: calc(var(--pl) + 64px); padding: 0; background: none; border: 0; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; }
+  .turntable { --pl: min(72vw, 36dvh, 300px); flex: 1; align-self: center; justify-content: center; width: calc(var(--pl) + 64px); padding: 0; background: none; border: 0; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; }
   .platter { width: var(--pl); height: var(--pl); }
   .arm { top: calc(50% - (var(--pl) + 26px) / 2 - 12px); right: 4px; height: calc(var(--pl) * .62); width: 40px; }
   .arm::before { width: 28px; height: 28px; }
@@ -136,7 +144,7 @@ button { font: inherit; color: inherit; cursor: pointer; -webkit-tap-highlight-c
   .cues button { flex: none; padding: 10px 12px; font-size: 12.5px; white-space: nowrap; border-radius: 999px; scroll-snap-align: start; }
   .faders { gap: 4px; padding-top: 2px; }
   .fader { gap: 6px; padding-top: 6px; }
-  .f-body { height: 132px; width: 46px; }
+  .f-body { height: 160px; width: 46px; }
   .f-cap { width: 40px; height: 22px; }
   .f-end { font-size: 10px; }
   .f-label { font-size: 11px; }
@@ -144,7 +152,7 @@ button { font: inherit; color: inherit; cursor: pointer; -webkit-tap-highlight-c
 @media (max-width: 640px) and (max-height: 720px) {
   .turntable { --pl: min(56vw, 28dvh, 220px); }
   .tt-hint { margin-top: 6px; }
-  .f-body { height: 104px; }
+  .f-body { height: 120px; }
   .share span { display: none; }
   .share { padding: 0 12px; }
   .brand { font-size: 14px; white-space: nowrap; }

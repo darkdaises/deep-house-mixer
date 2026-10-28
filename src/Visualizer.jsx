@@ -8,7 +8,7 @@ const mix = (a, b, t) => { const A = hex(a), B = hex(b); return A.map((v, i) => 
 function tint(top, bottom) {
   let m = document.querySelector('meta[name="theme-color"]');
   if (m) m.setAttribute('content', top);
-  document.documentElement.style.background = top;
+  document.documentElement.style.background = bottom;   // what shows behind the browser's bottom toolbar
   document.body.style.background = `linear-gradient(${top}, ${bottom})`;
 }
 
