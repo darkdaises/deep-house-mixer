@@ -160,4 +160,26 @@ button { font: inherit; color: inherit; cursor: pointer; -webkit-tap-highlight-c
   .brand em { display: none; }
   .by { font-size: 12px; padding: 6px 10px; white-space: nowrap; }
 }
+
+/* Desktop: the whole deck grows with the window and sits in the middle of the screen */
+@media (min-width: 821px) {
+  .app { min-height: 100vh; }
+  .deck { --disc: clamp(360px, min(34vw, calc(100vh - 330px)), 640px);
+    width: min(calc(var(--disc) * 2.45), 94vw); gap: clamp(18px, 2.4vh, 28px); padding-bottom: 5vh; }
+  .rig { grid-template-columns: minmax(0, 1.08fr) minmax(0, 1fr); gap: clamp(18px, 1.6vw, 28px); }
+  .turntable, .mixer { padding: calc(var(--disc) * .07); border-radius: 32px; }
+  .turntable { justify-content: center; }
+  .platter { width: var(--disc); height: var(--disc); }
+  .mixer { gap: calc(var(--disc) * .05); }
+  .cues { gap: 10px; }
+  .cues button { white-space: nowrap; padding: calc(var(--disc) * .035) 14px; font-size: clamp(14px, calc(var(--disc) * .036), 17px); }
+  .f-body { width: clamp(56px, calc(var(--disc) * .16), 76px); height: calc(var(--disc) * .56); }
+  .f-cap { width: clamp(46px, calc(var(--disc) * .13), 62px); height: clamp(26px, calc(var(--disc) * .072), 34px); }
+  .f-end { font-size: clamp(10.5px, calc(var(--disc) * .028), 13px); }
+  .f-label { font-size: clamp(12px, calc(var(--disc) * .032), 15px); }
+  .now { padding: 14px 16px 14px 14px; border-radius: 26px; }
+  .play { width: 56px; height: 56px; }
+  .np strong { font-size: clamp(22px, calc(var(--disc) * .06), 30px); }
+  .tt-hint { font-size: clamp(12px, calc(var(--disc) * .03), 14px); margin-top: calc(var(--disc) * .05); }
+}
 @media (prefers-reduced-motion: reduce) { .go { animation: none; } .deck > * { animation: none; } }
